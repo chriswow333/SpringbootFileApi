@@ -66,6 +66,7 @@ dependencies {
 
 	compile("org.springframework.boot:spring-boot-starter-quartz:2.0.3.RELEASE")
 	
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.11'
 
     compile group: 'org.springframework', name: 'spring-oxm', version: '5.0.7.RELEASE'
 	compile group: 'javax.activation', name: 'activation', version: '1.1.1'

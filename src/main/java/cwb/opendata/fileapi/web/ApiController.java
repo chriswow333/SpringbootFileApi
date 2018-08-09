@@ -1,6 +1,8 @@
 package cwb.opendata.fileapi.web;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +34,6 @@ public class ApiController {
 	
 	private static final Logger apiControllerExceptionLogger = LogManager.getLogger(ApiController.class);
 
-	
 	@Autowired
 	@Qualifier("datasetDao")
 	private DatasetDao datasetDao;
@@ -46,67 +47,109 @@ public class ApiController {
 	
 	@RequestMapping(path = "/govdownload", method = RequestMethod.GET,
 			produces = { "application/json", "application/xml", "application/octet-stream"})
-	public ResponseEntity<?> govdownload(final @RequestParam(value="dataid", required=true) String dataid ,
+	public ResponseEntity<?> govdownload(HttpServletRequest request,
+			final @RequestParam(value="dataid", required=true) String dataid ,
 							final @RequestParam(value="format", required=false) String format){
 		
 		String dataPath = datasetDao.getRealDataPath(dataid, format==null?"XML":format);
-		return getResources(dataPath);
-	
-		
+		return getResources(request, dataPath);
 	}
-	
 	
 	@RequestMapping(path = "/opendataapi",method = RequestMethod.GET,
 			produces = { "application/json", "application/xml", "application/octet-stream"})
-	public ResponseEntity<?> opendataapi(final @RequestParam(value="dataid", required=true) String dataid,
+	public ResponseEntity<?> opendataapi(HttpServletRequest request,
+			final @RequestParam(value="dataid", required=true) String dataid,
 			final @RequestParam(value="format", required=false)String format ) {
-		String dataPath = datasetDao.getRealDataPath(dataid, format==null?"XML":format);
 		
-		return getResources(dataPath);
+		String dataPath = datasetDao.getRealDataPath(dataid, format==null?"XML":format);
+		return getResources(request, dataPath);
+		
 	}
 	
 	@RequestMapping(path = "/opendata/**",method = RequestMethod.GET,
 			produces = { "application/json", "application/xml", "application/octet-stream"})
 	public ResponseEntity<?> opendata(HttpServletRequest request) {
+		
 		String dataPath = new StringBuilder(filePathPrefix).append(request.getRequestURI().substring(9)).toString();
-		return getResources(dataPath);
+		return getResources(request, dataPath);
+		
 	}
 	
-	
-	private ResponseEntity<?> getResources(String dataPath){
+	private ResponseEntity<?> getResources(HttpServletRequest requset, String dataPath){
 		Path path = null;
 		if(Optional.ofNullable(dataPath).isPresent() && Files.exists(path = Paths.get(dataPath))) {
-			try {
-				
-				String mimeType =  servletContext.getMimeType(dataPath);
-				MediaType mediaType = MediaType.parseMediaType(mimeType);
-				
-				InputStreamResource resource;
-				resource = new InputStreamResource(new FileInputStream(dataPath));
-				return ResponseEntity.ok()
-						// Content-Disposition
-						.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + path.getFileName())
-						// Content-Type
-						.contentType(mediaType)
-						// Contet-Length
-						.contentLength(Files.size(path)) //
-						.body(resource);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				apiControllerExceptionLogger.error("",e);
+			String fileHash = getFileCache(dataPath);
+			String clientHash = requset.getHeader(HttpHeaders.IF_NONE_MATCH);
+			if(Optional.ofNullable(clientHash).isPresent()) {
+				if(clientHash.equals(fileHash)) {
+					return cachedResponse(fileHash);
+				}
 			}
-			
+			return normalResponse(path, fileHash);
 		}else {
-			Map<String, String> map = new HashMap<>();
-			map.put("message", "Resouce not found.");
-			return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
+			return notFoundResponse();
 		}
-		
+	}
+	
+	private ResponseEntity<?> normalResponse(Path path, String fileHash){
+		String mimeType =  servletContext.getMimeType(path.toAbsolutePath().toString());
+		MediaType mediaType = MediaType.parseMediaType(mimeType);
+		try {
+			InputStreamResource resource;
+			resource = new InputStreamResource(new FileInputStream(path.toAbsolutePath().toString()));
+			return ResponseEntity.ok()
+					// Content-Disposition
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + path.getFileName())
+					.header(HttpHeaders.ETAG, fileHash)
+					// Content-Type
+					.contentType(mediaType)
+					// Contet-Length
+					.contentLength(Files.size(path)) //
+					.body(resource);
+		}catch(Exception e) {
+			apiControllerExceptionLogger.error("",e);
+		}
+		return errorResponse();
+	}
+	
+	private ResponseEntity<?> cachedResponse(String fileHash) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.ETAG, fileHash);
+		return new ResponseEntity<>("", headers, HttpStatus.NOT_MODIFIED);
+	}
+	
+	private ResponseEntity<?> errorResponse(){
 		Map<String, String> map = new HashMap<>();
 		map.put("message", "Under maintenance, please try later.");
 		return new ResponseEntity<>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
-		
+	private ResponseEntity<?> notFoundResponse(){
+		Map<String, String> map = new HashMap<>();
+		map.put("message", "Resouce not found.");
+		return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
+	}
+	
+	private String getFileCache(String dataPath){
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(new File(dataPath));
+			String hash = org.apache.commons.codec.digest.DigestUtils.md5Hex(fis);
+			// weak hash for Nginx proxy.
+			hash ="W/" + hash;
+			return hash;
+		}catch(IOException e) {
+			return null;
+		}finally {
+			try {
+				if(fis != null) {
+					fis.close();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }

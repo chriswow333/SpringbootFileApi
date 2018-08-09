@@ -28,11 +28,14 @@ public class AuthorizedInterceptor extends HandlerInterceptorAdapter  {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
             Object handler) throws Exception {
+    	
     	// Get authorization value in request parameter first. if it is not found, try to find in header.
     	String authorizationKey = ResourceEnum.REQ_PARAM_AUTHKEY.value();
+    	
     	String authorizationValue = Optional.ofNullable(request.getParameter(authorizationKey))
     			.orElse(Optional.ofNullable(request.getHeader(authorizationKey))
     					.orElse(""));
+    	
     	String authorizationKeyOld = ResourceEnum.REQ_PARAM_AUTHKEY_OLD.value();
     	
     	authorizationValue = authorizationValue.equals("")?Optional.ofNullable(request.getParameter(authorizationKeyOld))
