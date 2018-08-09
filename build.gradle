@@ -29,7 +29,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     baseName = 'OpendataFileApi'
-    version =  '1.0'
+    version =  '2.0'
 }
 
 // In this section you declare where to find the dependencies of your project

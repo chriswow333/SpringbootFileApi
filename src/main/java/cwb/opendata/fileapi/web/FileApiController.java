@@ -63,7 +63,7 @@ public class FileApiController {
 	@RequestMapping(path = "/opendata/**",method = RequestMethod.GET,
 			produces = { "application/json", "application/xml", "application/octet-stream"})
 	public ResponseEntity<?> opendata(HttpServletRequest request) {
-		String dataPath = new StringBuilder(filePathPrefix).append(request.getRequestURI().substring(9)).toString();
+		String dataPath = new StringBuilder(filePathPrefix).append(request.getRequestURI().substring(17)).toString();
 		return getResources(request, dataPath);
 	}
 	

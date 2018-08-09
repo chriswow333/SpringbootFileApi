@@ -5,8 +5,9 @@
 ##  Gradle start up script for UN*X
 ##
 ##############################################################################
-
 # Attempt to set APP_HOME
+JAVA_HOME=/usr/lib/jvm/jdk-10.0.2
+
 # Resolve links: $0 may be a link
 PRG="$0"
 # Need this for relative symlinks.
