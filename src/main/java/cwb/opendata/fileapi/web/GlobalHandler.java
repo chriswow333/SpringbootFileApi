@@ -26,7 +26,7 @@ public class GlobalHandler {
 		globalExceptionLogger.error("",ex);
 		Map<String, String> map = new HashMap<>();
 		map.put("message", "Under maintenance, please try later.");
-		return new ResponseEntity<>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Map<String,String>>(map, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(value = {NoHandlerFoundException.class})
@@ -35,7 +35,7 @@ public class GlobalHandler {
 		ex.printStackTrace();
 		Map<String, String> map = new HashMap<>();
 		map.put("message", "resource not found.");
-		return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Map<String,String>>(map, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(value = {HttpRequestMethodNotSupportedException.class})
@@ -44,7 +44,7 @@ public class GlobalHandler {
 		ex.printStackTrace();
 		Map<String, String> map = new HashMap<>();
 		map.put("message", "method not allowed.");
-		return new ResponseEntity<>(map, HttpStatus.METHOD_NOT_ALLOWED);
+		return new ResponseEntity<Map<String,String>>(map, HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 }

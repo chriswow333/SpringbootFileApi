@@ -27,41 +27,42 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cwb.opendata.fileapi.common.model.DatasetDao;
+import cwb.opendata.fileapi.common.model.DatasetService;
 
 @RestController
 public class ApiController {
 	
 	private static final Logger apiControllerExceptionLogger = LogManager.getLogger(ApiController.class);
-
+	
 	@Autowired
-	@Qualifier("datasetDao")
-	private DatasetDao datasetDao;
+	@Qualifier("datasetService")
+	private DatasetService datasetService;
 	
 	@Autowired
 	private ServletContext servletContext;
-
+	
 	@Autowired
 	@Qualifier("filePathPrefix")
 	private String filePathPrefix;
+	
 	
 	@RequestMapping(path = "/govdownload", method = RequestMethod.GET,
 			produces = { "application/json", "application/xml", "application/octet-stream"})
 	public ResponseEntity<?> govdownload(HttpServletRequest request,
 			final @RequestParam(value="dataid", required=true) String dataid ,
-							final @RequestParam(value="format", required=false) String format){
+			final @RequestParam(value="format", required=false) String format){
 		
-		String dataPath = datasetDao.getRealDataPath(dataid, format==null?"XML":format);
+		String dataPath = datasetService.getDatasetPathByDataid(dataid, format);
 		return getResources(request, dataPath);
 	}
 	
 	@RequestMapping(path = "/opendataapi",method = RequestMethod.GET,
-			produces = { "application/json", "application/xml", "application/octet-stream"})
+			produces = { "*/*", "application/json", "application/xml", "application/octet-stream"})
 	public ResponseEntity<?> opendataapi(HttpServletRequest request,
 			final @RequestParam(value="dataid", required=true) String dataid,
 			final @RequestParam(value="format", required=false)String format ) {
 		
-		String dataPath = datasetDao.getRealDataPath(dataid, format==null?"XML":format);
+		String dataPath = datasetService.getDatasetPathByDataid(dataid, format);
 		return getResources(request, dataPath);
 		
 	}
@@ -92,8 +93,10 @@ public class ApiController {
 	}
 	
 	private ResponseEntity<?> normalResponse(Path path, String fileHash){
+		
 		String mimeType =  servletContext.getMimeType(path.toAbsolutePath().toString());
-		MediaType mediaType = MediaType.parseMediaType(mimeType);
+		
+		MediaType mediaType = MediaType.parseMediaType(mimeType!=null?mimeType:"application/octet-stream");
 		try {
 			InputStreamResource resource;
 			resource = new InputStreamResource(new FileInputStream(path.toAbsolutePath().toString()));
@@ -115,18 +118,18 @@ public class ApiController {
 	private ResponseEntity<?> cachedResponse(String fileHash) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.ETAG, fileHash);
-		return new ResponseEntity<>("", headers, HttpStatus.NOT_MODIFIED);
+		return new ResponseEntity<String>("", headers, HttpStatus.NOT_MODIFIED);
 	}
 	
 	private ResponseEntity<?> errorResponse(){
 		Map<String, String> map = new HashMap<>();
 		map.put("message", "Under maintenance, please try later.");
-		return new ResponseEntity<>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Map<String,String>>(map, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	private ResponseEntity<?> notFoundResponse(){
 		Map<String, String> map = new HashMap<>();
-		map.put("message", "Resouce not found.");
+		map.put("message", "resource not found.");
 		return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
 	}
 	
