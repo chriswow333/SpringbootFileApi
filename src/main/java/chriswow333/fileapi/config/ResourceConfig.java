@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.config;
+package chriswow333.fileapi.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

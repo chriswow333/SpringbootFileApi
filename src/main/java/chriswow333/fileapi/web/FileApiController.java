@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.web;
+package chriswow333.fileapi.web;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import cwb.opendata.fileapi.common.model.DatasetService;
+import chriswow333.common.model.DatasetService;
 
 
 @RestController

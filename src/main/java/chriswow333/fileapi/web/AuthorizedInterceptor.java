@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.web;
+package chriswow333.fileapi.web;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import cwb.opendata.fileapi.common.model.UserDao;
-import cwb.opendata.fileapi.config.ResourceEnum;
+import chriswow333.common.model.UserDao;
+import chriswow333.fileapi.config.ResourceEnum;
 
 @Component("authorizedInterceptor")
 public class AuthorizedInterceptor extends HandlerInterceptorAdapter  {

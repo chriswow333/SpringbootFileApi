@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.web;
+package chriswow333.fileapi.web;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -20,8 +20,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cwb.opendata.fileapi.common.model.UserDao;
-import cwb.opendata.fileapi.config.ResourceEnum;
+import chriswow333.common.model.UserDao;
+import chriswow333.fileapi.config.ResourceEnum;
 
 @Component("accessLogInterceptor")
 public class AccessLogInterceptor extends HandlerInterceptorAdapter {

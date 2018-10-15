@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.config;
+package chriswow333.fileapi.config;
 
 public enum ResourceEnum {
 	

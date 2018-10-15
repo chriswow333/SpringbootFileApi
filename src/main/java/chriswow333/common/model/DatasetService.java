@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.common.model;
+package chriswow333.common.model;
 
 import java.util.List;
 import java.util.Optional;

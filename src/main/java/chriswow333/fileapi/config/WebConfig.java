@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.config;
+package chriswow333.fileapi.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,8 +9,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import cwb.opendata.fileapi.web.AccessLogInterceptor;
-import cwb.opendata.fileapi.web.AuthorizedInterceptor;
+import chriswow333.fileapi.web.AccessLogInterceptor;
+import chriswow333.fileapi.web.AuthorizedInterceptor;
 
 @Configuration
 @EnableWebMvc

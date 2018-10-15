@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.main;
+package chriswow333.fileapi.main;
 
 import java.util.Arrays;
 import java.util.TimeZone;
@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication(scanBasePackages = {"cwb.opendata.fileapi.**"})
+@SpringBootApplication(scanBasePackages = {"chriswow333.fileapi.**"})
 //@PropertySource("file:/data/workspace/git_java/OpendataFileApiBoot/OpendataFileApiBoot/src/main/resources/application.properties")
 public class Application{
 	

@@ -1,4 +1,4 @@
-package cwb.opendata.fileapi.common.model;
+package chriswow333.common.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
